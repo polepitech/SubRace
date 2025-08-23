@@ -24,6 +24,10 @@ Projet qui permet de suivre en direct l’évolution des abonnés sur **Instagra
 ## 🖼️ Exemple
  
 
+https://github.com/user-attachments/assets/9c89c75b-ae97-402e-8249-84b2d5ac3045
+
+
+
 ---
 
 ## ⚙️ Installation
@@ -41,8 +45,8 @@ IG_PASSWORD='';
 
 ## 📦 Déploiement
 
-Vps
-Cron job pour mettre à jour régulièrement les followers et generer une course.
+- Vps
+- Cron job pour mettre à jour régulièrement les followers et generer une course.
 
 
 
