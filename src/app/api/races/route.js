@@ -36,9 +36,9 @@ export async function POST(req) {
         });
 
         const body = await req.json();
-        const { day, followers_number, winner, second, third } = body;
+        const { day, followers_number, winner, second, third,postId,mediaId } = body;
 
-        const [result] = await connection.execute('INSERT INTO races (day, followers_number, winner, second, third) VALUES (?, ?, ?, ?, ?)', [day, followers_number, winner, second, third]);
+        const [result] = await connection.execute('INSERT INTO races (day, followers_number, winner, second, third, postId, mediaId) VALUES (?, ?, ?, ?, ?, ?, ?)', [day, followers_number, winner, second, third,postId,mediaId]);
 
         return new Response(JSON.stringify({ id: result.insertId }), {
             status: 200,

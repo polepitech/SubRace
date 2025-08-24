@@ -2,11 +2,12 @@ import puppeteer from 'puppeteer';
 import fs from 'fs-extra';
 import { loginInstagram } from './login.js';
 import { GetFollowersData } from './getSubData.js';
-import 'dotenv/config';
 import { StoreUserData } from './StoreData.js';
+import 'dotenv/config';
 
 
 (async () => {
+
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 

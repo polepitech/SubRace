@@ -11,7 +11,7 @@ export function generateFollowerBody(follower,size,ShowTexture,engine,bodies){
 
     img.onload = (() => {
         const random = Math.floor(Math.random() *  800);
-        const random2 = Math.floor(Math.random() * -3000);
+        const random2 = Math.floor(Math.random() * -300);
 
         const originalTextureSize = size * 5;
         const texture = ShowTexture ? createCircularTexture(img, originalTextureSize) : '';

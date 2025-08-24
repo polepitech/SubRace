@@ -39,8 +39,27 @@ npm dev
 ## 🔐 Variables d’environnement
 créer un .env
 ```bash
-IG_EMAIL='';
-IG_PASSWORD='';
+# Pour la connexion du scrapper
+IG_EMAIL=mail@mail.com
+IG_PASSWORD=Mdp
+
+# Pour securiser la page https://site.com?TOKEN=SECRURE_PAGE
+SECRURE_PAGE='créer un token ici'
+
+# Api INSTAGRAM
+ACCES_TOKEN=EAAJdsabjkbhjk....
+IG_ID=178.....
+
+# Pour renouvelement du token (50jour)
+APP_ID=6766867678...
+APP_SECRET=Dfghjdghjaghjghjdavhj...
+
+# Bucket S3
+S3_BUCKET=name
+AWS_ACCESS_KEY_ID=HDJKD...
+AWS_SECRET_ACCESS_KEY=jdhjkhajkdjahdjkbzbk......
+AWS_REGION=eu-..
+
 ```
 
 ## 📦 Déploiement
