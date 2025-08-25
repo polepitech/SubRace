@@ -2,7 +2,7 @@ import { Bodies, Composite } from 'matter-js';
 import { World } from "matter-js";
 
 
-export function generateFollowerBody(follower,size,ShowTexture,engine,bodies){
+export function generateFollowerBody(follower,size,ShowTexture,engine,bodies,width){
     const proxiedUrl = `http://localhost:3000/api/image?url=${encodeURIComponent(follower.image_url)}`;
     
     const img = new Image();
@@ -10,8 +10,8 @@ export function generateFollowerBody(follower,size,ShowTexture,engine,bodies){
     img.crossOrigin = "anonymous"; 
 
     img.onload = (() => {
-        const random = Math.floor(Math.random() *  800);
-        const random2 = Math.floor(Math.random() * -300);
+        const random = Math.floor(Math.random() *  width);
+        const random2 = Math.floor(Math.random() * -900);
 
         const originalTextureSize = size * 5;
         const texture = ShowTexture ? createCircularTexture(img, originalTextureSize) : '';
@@ -54,7 +54,7 @@ export function createCircularTexture(img, size) {
       return canvas.toDataURL(); // retourne une URL de texture ronde
     }
 
-    export function getLowestBody(world) {
+    export function getLowestBody(world,width) {
       let lowest = null;
       let maxY = -Infinity;
 
@@ -63,7 +63,7 @@ export function createCircularTexture(img, size) {
           maxY = body.position.y;
           lowest = body;
         }
-        if (!body.isStatic && (body.position.x < 0 || body.position.x > 800)) {
+        if (!body.isStatic && (body.position.x < 0 || body.position.x > width)) {
           World.remove(world, body);
           continue; // passer au corps suivant
         }

@@ -5,7 +5,7 @@ function App({searchParams}) {
 
   const token = React.use(searchParams).TOKEN;
   
-  if (token !== process.env.SECRURE_PAGE) {
+  if (token !== process.env.SECURE_PAGE) {
     return <></>
   }
 

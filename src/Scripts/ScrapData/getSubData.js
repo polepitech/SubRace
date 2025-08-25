@@ -35,9 +35,9 @@ export async function GetFollowersData (page) {
 
             
             //clean la liste
-            // console.log('🚧 Données récupérées :', ln);
+            console.log('🚧 Données récupérées :', ln);
             for (let i = ln.length - 1; i >= 0; i--) {
-                if (ln[i] == "·" || ln[i] == "Suivre" || ln[i] == "." || ln[i] == "Suggestions") {
+                if (ln[i] == "·" || ln[i] == "Suivre______" || ln[i] == "." || ln[i] == "Suggestions") {
                     ln.splice(i, 1);
                 }
             }
@@ -51,7 +51,7 @@ export async function GetFollowersData (page) {
                 followers.push([line]);
                 pickNext = false; // reset après avoir pris la ligne suivante
               }
-              if (line === 'Supprimer' || line === 'Rechercher' ) {
+              if (line === 'Suivre' || line === 'Rechercher' ) {
                 pickNext = true;
               }
             }

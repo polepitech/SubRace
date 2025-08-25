@@ -2,9 +2,16 @@ import fs from 'fs-extra';
 
 export async function loginInstagram(page) {
     console.log("⌛️ connexion en cours...")
+
     // Chargement des cookies
-    const cookies = JSON.parse(fs.readFileSync('cookies.json', 'utf8'));
-    await page.setCookie(...cookies);   
+    let cookies = null;
+    if (fs.existsSync("cookies.json")) {
+        const data = fs.readFileSync("cookies.json", "utf8");
+        cookies = JSON.parse(data);
+        await page.setCookie(...cookies);   
+    } else {
+        console.log("⚠️ Le fichier cookies.json est introuvable.");
+    }
     await page.goto('https://www.instagram.com/', { waitUntil: 'networkidle2' });
 
     // Consentement

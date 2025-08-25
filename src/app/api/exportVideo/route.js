@@ -22,7 +22,6 @@ export async function POST(req) {
     // --- Déclenche FFmpeg automatiquement ---
     const outputVideo = path.join(process.cwd(), 'output.mp4');
     const audioMP3 = path.join(process.cwd(), 'audio.mp3');
-    // const ffmpegCmd = `ffmpeg -y -framerate 30 -i ${framesDir}/frame_%d.png -c:v libx264 -pix_fmt yuv420p ${outputVideo}`;
     const ffmpegCmd = `ffmpeg -y -framerate 30 -i ${framesDir}/frame_%d.png -i ${audioMP3} -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest ${outputVideo}`;
 
     await new Promise((resolve, reject) => {

@@ -1,17 +1,18 @@
 import puppeteer from "puppeteer";
-// import fetch from "node-fetch"; // si tu veux appeler ta route API ensuite
+import 'dotenv/config';
 
 async function StartARace() {
 
     console.log("🚀 Lancement de Puppeteer...");
     const browser = await puppeteer.launch({
-        headless: true, // passe à false si tu veux voir le navigateur
+        headless: true, 
         defaultViewport: { width: 1280, height: 720 },
     });
 
     const page = await browser.newPage();
+    const TOKEN = process.env.SECURE_PAGE;
 
-    await page.goto("http://localhost:3000/", { waitUntil: "domcontentloaded" });
+    await page.goto("http://localhost:3000/?TOKEN="+TOKEN, { waitUntil: "domcontentloaded" });
     console.log("✅ Site chargé !");
 
     const intervalId = setInterval(async() => {

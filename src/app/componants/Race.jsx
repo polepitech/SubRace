@@ -28,9 +28,10 @@ export const Race = () => {
   
   
   
-  const Height = 8200;
-  const Width = 500;
-  const size = 25; // taille des followers 
+  const Height = 6200;
+  const CanvasHeigth = 1920;
+  const Width = 1080;
+  const size = 40; // taille des followers 
   const Multipy_Number = 1;
 
   
@@ -93,11 +94,15 @@ export const Race = () => {
           engine: engine,
           options: {
             width: Width,
-            height: 800,
+            height: CanvasHeigth,
             background: "#EE2A35",
             wireframes: false,
           },
       });
+
+      // taille d’affichage seulement
+      render.canvas.style.height = "800px";
+      render.canvas.style.maxWidth = "100%"; // pour s’adapter
 
       const canvas = render.canvas;
 
@@ -107,29 +112,29 @@ export const Race = () => {
       const bodies = [];
 
       followers.forEach(follower => {
-        generateFollowerBody(follower,size,ShowTexture,engine,bodies);
+        generateFollowerBody(follower,size,ShowTexture,engine,bodies,Width);
       });
 
       //////// CREER MAP /////////
       //////// CREER MAP /////////
 
-      const ground = Bodies.rectangle(400, Height, 810, 60, { isStatic: true ,render:{fillStyle:"#009736"}});
-      const finishBandeau = Bodies.rectangle(400, Height-150, 800, 300, { 
+      const ground = Bodies.rectangle(Width/2, Height, Width, 60, { isStatic: true ,render:{fillStyle:"#009736"}});
+      const finishBandeau = Bodies.rectangle(Width/2, Height-150, Width, 300, { 
         isStatic: true,  
         collisionFilter: { category: 0x0002, mask: 0x0000 } ,
         render:{sprite:{
           texture:'/finish.jpg',
           xScale: 1,
-          yScale: 1
+          yScale: 1,
         }}});
 
       const wallL = Bodies.rectangle(0,   Height/2-1000, 60, Height+2000, { isStatic: true });
-      const wallR = Bodies.rectangle(800, Height/2-1000, 60, Height+2000, { isStatic: true });
+      const wallR = Bodies.rectangle(Width, Height/2-1000, 60, Height+2000, { isStatic: true });
 
 
       Composite.add(engine.world, [finishBandeau,ground, wallL, wallR]);
 
-      generateMap(engine,Height);
+      generateMap(engine,Height,Width);
   
       const FPS = 30;
       const DELTA = 1000 / FPS; // durée d'une frame en ms (~40 ms pour 25 fps)
@@ -154,7 +159,7 @@ export const Race = () => {
 
       Events.on(engine, "afterUpdate", () => {
 
-        const lowestBody = getLowestBody(engine.world);
+        const lowestBody = getLowestBody(engine.world,Width);
         let lowestY = lowestBody ? lowestBody.position.y : 0;
         window.etat = lowestY /Height *100 ;
         setdebug(Math.floor(lowestY));
@@ -165,8 +170,8 @@ export const Race = () => {
 
         
         Render.lookAt(render, {
-          min: { x: 0, y: lowestY - Width/2 },
-          max: { x: 800, y: lowestY + Width/2 }
+          min: { x: 0, y: lowestY - CanvasHeigth/2 },
+          max: { x: Width, y: lowestY + CanvasHeigth/2 }
         });
 
         frames.push(render.canvas.toDataURL());
@@ -183,25 +188,25 @@ export const Race = () => {
         ctx.fillRect(0, 0, render.options.width, render.options.height);
         ctx.globalCompositeOperation = 'source-over';
 
-        ctx.font = "bold 30px Arial";
+        ctx.font = "bold 60px Arial";
 
         ctx.fillStyle = "white";
         ctx.textAlign = "center"; 
-        ctx.fillText("Day: " + (races.length + 1)+" followers: " + followers.length, 250, 650);
+        ctx.fillText("Day: " + (races.length + 1)+" followers: " + followers.length, Width/2, CanvasHeigth-CanvasHeigth/4.2);
 
         if(asfirst)drawPodium(ctx,  1, asfirst);
         if(asSecond)drawPodium(ctx, 2, asSecond);
         if(asThird)drawPodium(ctx,  3, asThird);
 
         if(frame < 180){
-          drawIntro("Making my followers",0,ctx);
-          drawIntro("race every day",40,ctx);
+          drawIntro("Making my followers",80,50,ctx);
+          drawIntro("race every day",80,150,ctx);
           if(frame > 90 && frame < 120)
-          drawIntro("3",120,ctx);
+          drawIntro("3",300,CanvasHeigth/2,ctx);
           if(frame > 120 && frame < 150)
-          drawIntro("2",120,ctx);          
+          drawIntro("2",300,CanvasHeigth/2,ctx);          
           if(frame > 150)
-          drawIntro("1",120,ctx);
+          drawIntro("1",300,CanvasHeigth/2,ctx);
         }
 
 
@@ -250,17 +255,21 @@ export const Race = () => {
   function drawPodium(ctx, place, player) {
 
     let url = player.image_url;
+    const xPos = ((Width/3 * (place-1)) + 50);
+
+    drawIntro(player.username,40,CanvasHeigth-120,ctx,xPos+100)
 
     if (podiumTextures[place]) {
-      ctx.drawImage(podiumTextures[place], (150 * place-100 ), 680);
+      ctx.drawImage(podiumTextures[place], xPos, CanvasHeigth - CanvasHeigth/5);
       return;
     }
+
 
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = `http://localhost:3000/api/image?url=${encodeURIComponent(url)}`;
     img.onload = () => {
-      const textureURL = createCircularTexture(img, 100);
+      const textureURL = createCircularTexture(img, 256);
       const circularImg = new Image();
       circularImg.src = textureURL;
       circularImg.onload = () => {
@@ -269,20 +278,16 @@ export const Race = () => {
     };
   }
 
-  const drawIntro = (text,offset,ctx) => {
+  const drawIntro = (text,size,offset,ctx,width = Width/2) => {
     ctx.save();
-    if(offset > 100){
-      ctx.font = "bold 50px Arial";
-    }else{
-      ctx.font = "bold 30px Arial";
-    }
+      ctx.font = `bold ${size}px Arial`;
 
     ctx.textAlign = "center";
     ctx.lineWidth = 6;
     ctx.strokeStyle = "rgba(0,0,0,0.6)";
-    ctx.strokeText(text, Width / 2, 100+offset);
+    ctx.strokeText(text, width , 100+offset);
     ctx.fillStyle = "white";
-    ctx.fillText(text, Width / 2, 100+offset);
+    ctx.fillText(text, width , 100+offset);
     ctx.restore();
   };
 
@@ -364,7 +369,7 @@ export const Race = () => {
 
   return (
     <div className='flex justify-center items-center h-screen w-screen'>
-      <div ref={boxRef} className='box '>
+      <div ref={boxRef} className='box'>
         {showDebug && <div className="debug z-10 absolute bottom-5 font-black text-2xl right-10">{debug}</div>}
       </div>
       <div className="absolute bg-red-600 bottom-0 right-0 p-4 font-bold flex flex-col gap-2">
