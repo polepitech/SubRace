@@ -50,6 +50,9 @@ export async function POST(req:Request) {
     await sleep(20000);
 
     // 3) Publier
+    const shouldRetry = (j:any, status:number) =>
+    j?.error?.code === 9007 || j?.error?.is_transient === true || status >= 500;
+
     let published_id: string | null = null;
     let lastError: any = null;
     const maxTries = 5;
@@ -75,12 +78,8 @@ export async function POST(req:Request) {
         break; 
       }
 
-      const code = json?.error?.code ?? json?.code;
-      if (code === 9007 && attempt < maxTries) {
-        await sleep(5000+delay);
-        delay += 5000;      
-        lastError = json;
-        continue;
+      if (shouldRetry(json, res.status) && attempt < 5) {
+        await sleep(delay); delay += 5000; lastError = json; continue;
       }
         lastError = { status: res.status, ...json };
         break;

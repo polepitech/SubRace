@@ -67,9 +67,10 @@ export async function POST(req: Request) {
       access_token: ACCESS_TOKEN,
     });
 
-    if (userTags.length > 0) {
-      params.append("user_tags", JSON.stringify(userTags));
-    }
+    // if (userTags.length > 0) {
+    //   params.append("user_tags", JSON.stringify(userTags));
+    // }
+    // console.log(params.toString());
 
     const res = await fetch(`${GRAPH}/${IG_USER_ID}/media`, {
       method: "POST",

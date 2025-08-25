@@ -28,7 +28,7 @@ export const Race = () => {
   
   
   
-  const Height = 6200;
+  const Height = 8200;
   const Width = 500;
   const size = 25; // taille des followers 
   const Multipy_Number = 1;
@@ -41,8 +41,8 @@ export const Race = () => {
   const showDebug = false;
   const [debug, setdebug] = useState('')
 
-  const exportAfterGame = true;
-  const postOnIg = false;
+  const exportAfterGame = useRef(true);
+  const postOnIg = useRef(false);
 
 
 
@@ -140,7 +140,7 @@ export const Race = () => {
 
         if(pause.current) return; 
         if(asFinish && delayBeforeEnd > 90) {
-          if(exportAfterGame) exportVideo(frames);
+          if(exportAfterGame.current) exportVideo(frames);
           clearInterval(intervalId);
           return
         }; // ne pas continuer si la course est finie
@@ -234,6 +234,12 @@ export const Race = () => {
       if (e.code === "Space") {
         pause.current = !pause.current;
       }
+      if (e.code === "KeyP") {
+        postOnIg.current = !postOnIg.current;
+      }
+      if (e.code === "KeyE") {
+        exportAfterGame.current = !exportAfterGame.current;
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -321,12 +327,12 @@ export const Race = () => {
   }
 
   async function exportVideo(frames) {
-    if(!exportAfterGame) return;
+    if(!exportAfterGame.current) return;
     const vid = await fetch('/api/exportVideo', {
       method: 'POST',
       body: JSON.stringify(frames),
     });
-    if(vid.ok && postOnIg) {
+    if(vid.ok && postOnIg.current) {
       const newRace = await fetch('/api/postRace', {
         method: 'POST',
         body: JSON.stringify({ 
@@ -339,7 +345,15 @@ export const Race = () => {
       });
       if(newRace.ok) {
         window.gameFinished = true;
-      }else{
+      }else {
+        console.error("Erreur API:", newRace.status, newRace.statusText);
+        try {
+          const errData = await newRace.json(); 
+          console.error("Détails:", errData);
+        } catch {
+          const errText = await newRace.text();
+          console.error("Détails (texte brut):", errText);
+        }
         window.gameFinished = true;
       }
     }
@@ -352,6 +366,11 @@ export const Race = () => {
     <div className='flex justify-center items-center h-screen w-screen'>
       <div ref={boxRef} className='box '>
         {showDebug && <div className="debug z-10 absolute bottom-5 font-black text-2xl right-10">{debug}</div>}
+      </div>
+      <div className="absolute bg-red-600 bottom-0 right-0 p-4 font-bold flex flex-col gap-2">
+       <p>ExportVideo: {exportAfterGame.current ? 'Oui' : 'Non'}</p>
+       <p>Publication: {postOnIg.current ? 'Oui' : 'Non'}</p>
+       <p>hauteur: {debug}</p>
       </div>
     </div>
   )
