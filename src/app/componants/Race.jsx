@@ -1,8 +1,8 @@
 'use client'
 import Matter from "matter-js";
 import React, { useEffect, useRef, useState } from 'react';
-import { generateMap } from "../../../Scripts/Race/MapGeneration";
-import { createCircularTexture, generateFollowerBody, getLowestBody } from "../../../Scripts/Race/Utils";
+import { generateMap } from "../../Scripts/Race/MapGeneration";
+import { createCircularTexture, generateFollowerBody, getLowestBody } from "../../Scripts/Race/Utils";
 
 
 
@@ -42,7 +42,7 @@ export const Race = () => {
   const [debug, setdebug] = useState('')
 
   const exportAfterGame = true;
-  const postOnIg = true;
+  const postOnIg = false;
 
 
 
@@ -193,6 +193,18 @@ export const Race = () => {
         if(asSecond)drawPodium(ctx, 2, asSecond);
         if(asThird)drawPodium(ctx,  3, asThird);
 
+        if(frame < 180){
+          drawIntro("Making my followers",0,ctx);
+          drawIntro("race every day",40,ctx);
+          if(frame > 90 && frame < 120)
+          drawIntro("3",120,ctx);
+          if(frame > 120 && frame < 150)
+          drawIntro("2",120,ctx);          
+          if(frame > 150)
+          drawIntro("1",120,ctx);
+        }
+
+
 
 
       });
@@ -250,6 +262,23 @@ export const Race = () => {
       };
     };
   }
+
+  const drawIntro = (text,offset,ctx) => {
+    ctx.save();
+    if(offset > 100){
+      ctx.font = "bold 50px Arial";
+    }else{
+      ctx.font = "bold 30px Arial";
+    }
+
+    ctx.textAlign = "center";
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = "rgba(0,0,0,0.6)";
+    ctx.strokeText(text, Width / 2, 100+offset);
+    ctx.fillStyle = "white";
+    ctx.fillText(text, Width / 2, 100+offset);
+    ctx.restore();
+  };
 
   function checkWinners(bodies,Events,engine) {
       for (const body of bodies) {

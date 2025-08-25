@@ -9,6 +9,9 @@ const share = true;
 type UploadBody = {
   url?: string;  
   caption?: string;   
+  winner?:string;
+  second?:string;
+  third?:string;
 
 };
 
@@ -33,6 +36,21 @@ export async function POST(req: Request) {
     const body: UploadBody = await req.json();
     const videoUrl = body.url;
     const caption = body.caption || '';
+    const winner = body.winner || null;
+    const second = body.second || null;
+    const third = body.third || null;
+
+    const userTags: any[] = [];
+
+    if (winner) {
+      userTags.push({ username: winner, x: 0.5, y: 0.2 });
+    }
+    if (second) {
+      userTags.push({ username: second, x: 0.5, y: 0.5 });
+    }
+    if (third) {
+      userTags.push({ username: third, x: 0.5, y: 0.8 });
+    }
     
     if (!videoUrl) {
       return NextResponse.json(
@@ -48,6 +66,10 @@ export async function POST(req: Request) {
       caption: caption,
       access_token: ACCESS_TOKEN,
     });
+
+    if (userTags.length > 0) {
+      params.append("user_tags", JSON.stringify(userTags));
+    }
 
     const res = await fetch(`${GRAPH}/${IG_USER_ID}/media`, {
       method: "POST",

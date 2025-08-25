@@ -39,7 +39,7 @@ export async function POST(req:Request) {
     const toIgMedia = await fetch("http://localhost:3000/api/uploadVideo", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: JSON.stringify({ url: tos3.url, caption:CAPTION }),
+      body: JSON.stringify({ url: tos3.url, caption:CAPTION,winner:winner, second:second, third:third }),
     }).then(r => r.json());
 
     if (!toIgMedia.ok) return NextResponse.json({ step: "Insta_Media", error: toIgMedia }, { status: 500 });
@@ -122,14 +122,17 @@ export async function POST(req:Request) {
 }
 
 function generateCaption(data: RacePayload): string {
-  return `🏁 Daily Race #${data.day} !!
+  return `🏁 Daily Race of day ${data.day} !!
   🔥 ${data.followers_number.toLocaleString()} followers fought today!
 
   🥇 1st: @${data.winner}
   🥈 2nd: @${data.second}
   🥉 3rd: @${data.third}
 
-  ➡️ Follow me for tomorrow's race! 🚀`;
+  ➡️ Follow me for tomorrow's race! 🚀
+
+  #marblerace #viral #subrace #followersrace #dailypost
+  `;
 }
 
 async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }

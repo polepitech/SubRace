@@ -5,7 +5,7 @@ import { exec } from 'child_process';
 export async function POST(req) {
   try {
     let frames = await req.json(); // tableau de dataURL
-    frames = frames.slice(20, -1);
+    frames = frames.slice(30, -1);
 
     const framesDir = path.join(process.cwd(), 'frames');
     if (!fs.existsSync(framesDir)) fs.mkdirSync(framesDir);
@@ -21,7 +21,9 @@ export async function POST(req) {
 
     // --- Déclenche FFmpeg automatiquement ---
     const outputVideo = path.join(process.cwd(), 'output.mp4');
-    const ffmpegCmd = `ffmpeg -y -framerate 30 -i ${framesDir}/frame_%d.png -c:v libx264 -pix_fmt yuv420p ${outputVideo}`;
+    const audioMP3 = path.join(process.cwd(), 'audio.mp3');
+    // const ffmpegCmd = `ffmpeg -y -framerate 30 -i ${framesDir}/frame_%d.png -c:v libx264 -pix_fmt yuv420p ${outputVideo}`;
+    const ffmpegCmd = `ffmpeg -y -framerate 30 -i ${framesDir}/frame_%d.png -i ${audioMP3} -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest ${outputVideo}`;
 
     await new Promise((resolve, reject) => {
       exec(ffmpegCmd, (error, stdout, stderr) => {

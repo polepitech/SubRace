@@ -11,10 +11,11 @@ const factories = [
 
 export  function generateMap(engine,Height) {
   shuffle(factories);
+  makeStarter(engine);
   const numberOfLevel = Math.floor(Height / 2000);
   for (let i = 0; i < numberOfLevel; i++) {
     const funct = factories[i];
-    funct(engine, i * 2000);
+    funct(engine, (i * 2000)+0);
   }
 }
 
@@ -123,5 +124,17 @@ function shuffle(array) {
     ];
   }
   return array;
+}
+
+function makeStarter(engine){
+    let sol =  Bodies.rectangle(400, -200, 800, 60, { isStatic: true });
+    Composite.add(engine.world, sol);
+    let timmer = 0;
+    Events.on(engine, "afterUpdate", () => {
+      timmer ++
+      if(timmer >= 180){
+        Composite.remove(engine.world, sol); 
+      }
+    });
 }
 
