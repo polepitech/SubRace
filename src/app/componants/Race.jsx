@@ -28,7 +28,7 @@ export const Race = () => {
   
   
   
-  const Height = 6200;
+  const Height = 8200;
   const CanvasHeigth = 1920;
   const Width = 1080;
   const size = 40; // taille des followers 
@@ -331,35 +331,66 @@ export const Race = () => {
     });
   }
 
+  function dataURLToBlob(dataUrl) {
+    const [header, base64] = dataUrl.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+    const binary = atob(base64);
+    const len = binary.length;
+    const u8 = new Uint8Array(len);
+    for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+    return new Blob([u8], { type: mime });
+  }
+
   async function exportVideo(frames) {
     if(!exportAfterGame.current) return;
-    const vid = await fetch('/api/exportVideo', {
-      method: 'POST',
-      body: JSON.stringify(frames),
+
+    const form = new FormData();
+    frames.forEach((frame, i) => {
+      const blob = typeof frame === 'string' && frame.startsWith('data:')
+        ? dataURLToBlob(frame)
+        : frame; // si c’est déjà un Blob
+      form.append('frames', blob, `frame_${String(i).padStart(6,'0')}.png`);
     });
-    if(vid.ok && postOnIg.current) {
-      const newRace = await fetch('/api/postRace', {
+
+    try {
+      const vid = await fetch('/api/exportVideo', {
         method: 'POST',
-        body: JSON.stringify({ 
-          day: races.length+1,
-          followers_number: followers.length,
-          winner: asfirst.username,
-          second: asSecond.username,
-          third: asThird.username
-        }),
+        body: form,
       });
-      if(newRace.ok) {
-        window.gameFinished = true;
-      }else {
-        console.error("Erreur API:", newRace.status, newRace.statusText);
-        try {
-          const errData = await newRace.json(); 
-          console.error("Détails:", errData);
-        } catch {
-          const errText = await newRace.text();
-          console.error("Détails (texte brut):", errText);
+      
+      if(vid.ok && postOnIg.current) {
+        const newRace = await fetch('/api/postRace', {
+          method: 'POST',
+          body: JSON.stringify({ 
+            day: races.length+1,
+            followers_number: followers.length,
+            winner: asfirst.username,
+            second: asSecond.username,
+            third: asThird.username
+          }),
+        });
+        if(newRace.ok) {
+          window.gameFinished = true;
+        }else {
+          console.error("Erreur API:", newRace.status, newRace.statusText);
+          try {
+            const errData = await newRace.json(); 
+            console.error("Détails:", errData);
+          } catch {
+            const errText = await newRace.text();
+            console.error("Détails (texte brut):", errText);
+          }
+          window.gameFinished = true;
         }
+      }else{
         window.gameFinished = true;
+        console.log('erreur de lexport',vid.error);
+      }
+
+    } catch (error) {
+      console.error("Erreur pendant le fetch:", error);
+      if (error instanceof Error) {
+        console.error("Message:", error.message);
       }
     }
 

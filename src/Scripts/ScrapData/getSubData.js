@@ -1,13 +1,22 @@
+import { TestEdge } from "./testEdge.js";
+
 export async function GetFollowersData (page) {
     await page.goto('https://www.instagram.com/SubRace_/', { waitUntil: 'networkidle2' });
+
+    const isMonCompte = 'new';
     const targetHref = '/subrace_/followers/';
     const targetLink = await page.$(`a[href="${targetHref}"]`);
+
     if (targetLink) {
-        await targetLink.click();
+      const tracker = await TestEdge(page);      // <- brancher l'écouteur AVANT de scroller
+
+      await targetLink.click();
+      await new Promise(r => setTimeout(r, 2000));
+      // await page.screenshot({ path: 'debug.png', fullPage: true });
         let modal = await page.$('div[role="dialog"]');
         if (modal) {
+          console.log('✅ Modal ouverte');
 
-            console.log('✅ Modal ouverte');
             let scrollDiv = null;
             while (scrollDiv === null) {
                 await new Promise(r => setTimeout(r, 2000));
@@ -18,7 +27,11 @@ export async function GetFollowersData (page) {
             if (!scrollDiv) {
                 console.log('⚠️ Div scrollable introuvable (overflow-y: scroll)');
             } else {
-                await scrollElementToEnd(scrollDiv, { pause: 2000, maxIdle: 3 });
+              await scrollElementToEnd(scrollDiv, { pause: 2000, maxIdle: 3 });
+
+              const users = tracker.getUsers();          // tous les users récupérés pendant le scroll
+              const cursor = tracker.getCursor();        // dernier cursor vu (si tu veux continuer côté code)
+              console.log('Total users collectés (REST):', users.length);
             }
 
 
@@ -35,9 +48,12 @@ export async function GetFollowersData (page) {
 
             
             //clean la liste
-            console.log('🚧 Données récupérées :', ln);
+            // console.log('🚧 Données récupérées :', ln);
             for (let i = ln.length - 1; i >= 0; i--) {
-                if (ln[i] == "·" || ln[i] == "Suivre______" || ln[i] == "." || ln[i] == "Suggestions") {
+                if (ln[i] == "·" || ln[i] == "." || ln[i] == "Suggestions") {
+                    ln.splice(i, 1);
+                }
+                if(isMonCompte && ln[i] == 'Suivre'){
                     ln.splice(i, 1);
                 }
             }
@@ -51,11 +67,11 @@ export async function GetFollowersData (page) {
                 followers.push([line]);
                 pickNext = false; // reset après avoir pris la ligne suivante
               }
-              if (line === 'Suivre' || line === 'Rechercher' ) {
+              if (isMonCompte && line == 'Supprimer' || !isMonCompte && line == 'Suivre' || line === 'Rechercher' ) {
                 pickNext = true;
               }
             }
-            console.log('🚧 Followers:', followers);
+            // console.log('🚧 Followers:', followers);
 
             const firstSixImages = await modal.evaluate((modalEl, count) => {
                 const imgs = Array.from(modalEl.querySelectorAll('img'));

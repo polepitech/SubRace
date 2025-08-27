@@ -22,6 +22,7 @@ for (let follower of data) {
       'INSERT INTO followers (username, image_url) VALUES (?, ?)',
       [username, image]
     );
+    console.log('👌new follower:',username)
   } catch (error) {
     count --;
     // console.error('Error inserting follower:', error);

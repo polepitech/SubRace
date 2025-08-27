@@ -13,7 +13,7 @@ puppeteer.use(StealthPlugin());
 
 
     const browser = await puppeteer.launch({ 
-        headless: "new" ,
+        headless: 'new' ,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -22,6 +22,10 @@ puppeteer.use(StealthPlugin());
     });
 
     const page = await browser.newPage();
+
+    // UA “non-headless”
+    const ua = (await browser.userAgent()).replace('Headless', '');
+    await page.setUserAgent(ua);
 
     await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
@@ -50,16 +54,20 @@ puppeteer.use(StealthPlugin());
     
     if (!followers || followers.length === 0) {
         console.log('❌ No followers data retrieved.');
-        await browser.close();
-        return;
+        await StopScript(browser);
+
     }
 
     const result = await StoreUserData(followers);
     console.log(result);
 
-    await browser.close();
-    return;
+    await StopScript(browser);
     
     
 
 })();
+
+async function StopScript(browser){
+    await browser.close();
+    return;
+}

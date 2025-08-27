@@ -5,7 +5,7 @@ async function StartARace() {
 
     console.log("🚀 Lancement de Puppeteer...");
     const browser = await puppeteer.launch({
-        headless: true, 
+        headless: false, 
         defaultViewport: { width: 1280, height: 720 },
     });
 
